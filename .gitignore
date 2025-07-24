@@ -177,3 +177,5 @@ src/runThis2Build.bat
 /output
 /.vs
 *.cmd
+/.vscode
+/.idea
