@@ -1,15 +1,16 @@
-import random, time, os, requests, asyncio, argparse, sys, pyperclip
+import random, time, requests, asyncio, pyperclip
 from packaging.version import InvalidVersion
 from googletrans import Translator, LANGUAGES
 from tqdm import tqdm
 
 ver = "0.0.3-alpha.5"
 exiting = 0
+wawa = "wawa" # wawa
 
 #might remove this in the future because file size
-cli = argparse.ArgumentParser(description="BadTranslate CLI")
-cli.add_argument("-s", "--simple", action="store_true", help="Use the simple mode")
-args = cli.parse_args()
+#cli = argparse.ArgumentParser(description="BadTranslate CLI")
+#cli.add_argument("-s", "--simple", action="store_true", help="Use the simple mode")
+#args = cli.parse_args()
 
 def unknownErr():
 	print("Error 4: An unknown error ocurred")
@@ -20,7 +21,7 @@ def err1(q):
 		input('Error 1: Unexpected String. Press "Enter" to exit.')
 
 try:
-	response = requests.get("https://github.com/MrCatGitHub/BadTranslate/releases/latest", allow_redirects=False)
+	response = requests.get("https://github.com/MrCatOwO/BadTranslate/releases/latest", allow_redirects=False)
 	urlHead = response.headers.get("Location")
 	if urlHead:
 		ghVer = urlHead.rsplit("/", 1)[-1]
@@ -43,18 +44,17 @@ try:
 except InvalidVersion as e:
 	print(f"Error 3: Failed to parse: {e}")
 	ret = ("")
-
 def checkLangCode(lang):
 	return lang in LANGUAGES
 	
 if ret == 1:
-	print(f"Outdated version! Please update at github.com/MrCatGitHub/BadTranslate/releases/latest ({ver} < {ghVer})")
+	print(f"Outdated version! Please update at github.com/MrCatOwO/BadTranslate/releases/latest ({ver} < {ghVer})")
 elif ret == -1:
 	print(f"You are running a version from the future. You're either a developer, or something messed up big time. ({ver} > {ghVer})")
 elif ret == 2:
 	print(f"You are running the latest version! ({ver})")
 elif ret == 0:
-	unknownErr
+	print("????? how")
 else:
 	print("")
 def random_language_code():
@@ -75,17 +75,6 @@ async def translateText(text, iterations, langCode):
 			tqdm.write(f"Error during translation at iteration {i + 1}: {e}")
 			time.sleep(1)
 	return translated
-async def translateTextSimple(text, iterations, langCode):
-	translator = Translator()
-	translated = text
-	for i in tqdm(range(iterations), desc="Translating"):
-		try:
-			lang_code = random_language_code()
-			randomTrans = await translator.translate(translated, dest=lang_code)
-			resultTrans = await translator.translate(randomTrans.text, dest=langCode)
-			translated = resultTrans.text
-		except:
-			print("Something went wrong... =(")
 
 def main():
 	inputText = input("Enter the text you want to translate: ").strip()
@@ -108,8 +97,8 @@ def main():
 		iterations = 100
 	elif iterations.isdigit():
 		iterations = int(iterations)
-	else:#                                                                     I don't care that this is technically not an integer;
-		print(f'"{iterations}" is not an integer. Setting iterations to 100.')#it's integer enough for me.
+	else:#                                                                      I don't care that this is technically not an integer;
+		print(f'"{iterations}" is not an integer. Setting iterations to 100.')# it's integer enough for me.
 		iterations = 100
 	if iterations >= 1000:
 		print("An extremely high number of iterations has been selected; this might take 15 minutes or more.")
@@ -117,10 +106,7 @@ def main():
 		print("A high number of iterations has been selected; this might take a long time.")
 	elif iterations <= 0:
 		print("You've selected 0 or fewer iterations; nothing will happen.")
-	if not args.simple:
-		translated_text = asyncio.run(translateText(inputText, iterations, langCode))
-	else:
-		translated_text = asyncio.run(translateTextSimple(inputText, iterations, langCode))
+	translated_text = asyncio.run(translateText(inputText, iterations, langCode))
 	print("Original text:", inputText)
 	print("Translated text:", translated_text)
 
@@ -130,14 +116,14 @@ def main():
 def launcher():
 	while True:
 		main()
-		yn = input('Done. Try another word? (y/n) ').strip().lower() #y didnt i use .lower() and .strip() and before?
-		if yn == 'y':
+		yn = input('Done. Try another word? (y/n) ').strip().lower() #y didnt i use .lower() before?
+		if yn == 'y' or yn == 'yes':
 			launcher()
-		elif yn == 'n':
+		elif yn == 'n' or yn == 'no':
 			print('Exiting now...')
 			if ret == -1:
 				print("Now get back in your DeLorean") #Back to the future reference hehe
-			pass
+			raise SystemExit
 		else:
 			err1(1)
 launcher()
