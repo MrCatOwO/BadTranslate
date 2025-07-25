@@ -1,16 +1,19 @@
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from main import checkLangCode
 from googletrans import LANGUAGES
 import random
 import string
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 def generateRandomStrings(num, length=2):
     return [''.join(random.choices(string.ascii_lowercase, k=length)) for _ in range(num)]
 
 def removeMatchesFromLanguages(randomList, languages):
     return [item for item in randomList if item not in languages]
+
+def checkLangCode(lang):
+	return lang in LANGUAGES
 
 randomStrings = generateRandomStrings(10, random.randint(2, 3))
 
