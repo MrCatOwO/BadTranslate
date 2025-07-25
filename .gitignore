@@ -180,3 +180,4 @@ src/runThis2Build.bat
 *.bat
 /.vscode
 /.idea
+/tools
