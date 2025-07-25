@@ -25,7 +25,7 @@ try:
 	urlHead = response.headers.get("Location")
 	if urlHead:
 		ghVer = urlHead.rsplit("/", 1)[-1]
-		ret = ghVer
+		verCompare = ghVer
 	else:
 		print("Error 2: Could not find version")
 except requests.RequestException as e:
@@ -34,26 +34,26 @@ ghVer = ghVer.lstrip("v")
 ver = ver.lstrip("v")
 try:
 	if ghVer > ver:
-		ret = 1
+		verCompare = 1
 	elif ghVer < ver:
-		ret = -1
+		verCompare = -1
 	elif ghVer := ver:
-		ret = 2
+		verCompare = 2
 	else:
-		ret = 0
+		verCompare = 0
 except InvalidVersion as e:
 	print(f"Error 3: Failed to parse: {e}")
-	ret = ("")
+	verCompare = ("")
 def checkLangCode(lang):
 	return lang in LANGUAGES
 	
-if ret == 1:
+if verCompare == 1:
 	print(f"Outdated version! Please update at github.com/MrCatOwO/BadTranslate/releases/latest ({ver} < {ghVer})")
-elif ret == -1:
+elif verCompare == -1:
 	print(f"You are running a version from the future. You're either a developer, or something messed up big time. ({ver} > {ghVer})")
-elif ret == 2:
+elif verCompare == 2:
 	print(f"You are running the latest version! ({ver})")
-elif ret == 0:
+elif verCompare == 0:
 	print("????? how")
 else:
 	print("")
@@ -61,13 +61,16 @@ def random_language_code():
 	languages = list(LANGUAGES.keys())
 	return random.choice(languages)
 
-async def translateText(text, iterations, langCode):
+async def translateText(text, iterations, langCode): # do not touch unless you want a really bad time
 	translator = Translator()
 	translated = text
 	for i in tqdm(range(iterations), desc="Translating"):
 		try:
-			lang_code = random_language_code()
-			randomTrans = await translator.translate(translated, dest=lang_code)
+			while True:
+				randomLang = random_language_code()
+				if randomLang != langCode:
+					break
+			randomTrans = await translator.translate(translated, dest=randomLang)
 			resultTrans = await translator.translate(randomTrans.text, dest=langCode)
 			translated = resultTrans.text
 			tqdm.write(f"Iteration {i + 1}/{iterations}: {translated}")
@@ -97,7 +100,7 @@ def main():
 		iterations = 100
 	elif iterations.isdigit():
 		iterations = int(iterations)
-	else:#                                                                      I don't care that this is technically not an integer;
+	else: #                                                                     I don't care that this is technically not an integer;
 		print(f'"{iterations}" is not an integer. Setting iterations to 100.')# it's integer enough for me.
 		iterations = 100
 	if iterations >= 1000:
@@ -118,10 +121,10 @@ def launcher():
 		main()
 		yn = input('Done. Try another word? (y/n) ').strip().lower() #y didnt i use .lower() before?
 		if yn == 'y' or yn == 'yes':
-			launcher()
+			continue
 		elif yn == 'n' or yn == 'no':
 			print('Exiting now...')
-			if ret == -1:
+			if verCompare == -1:
 				print("Now get back in your DeLorean") #Back to the future reference hehe
 			raise SystemExit
 		else:

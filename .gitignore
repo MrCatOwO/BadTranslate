@@ -179,3 +179,4 @@ src/runThis2Build.bat
 *.cmd
 /.vscode
 /.idea
+build.bat
