@@ -104,7 +104,7 @@ def main():
 		print(f'"{iterations}" is not an integer. Setting iterations to 100.')# it's integer enough for me.
 		iterations = 100
 	if iterations >= 1000:
-		print("An extremely high number of iterations has been selected; this might take 15 minutes or more.")
+		print("An extremely high number of iterations has been selected; this might take 30 minutes or more.")
 	elif iterations >= 250:
 		print("A high number of iterations has been selected; this might take a long time.")
 	elif iterations <= 0:
@@ -119,13 +119,13 @@ def main():
 def launcher():
 	while True:
 		main()
-		yn = input('Done. Try another word? (y/n) ').strip().lower() #y didnt i use .lower() before?
+		yn = input('Done. Try another word? (y/n) ').strip().lower()
 		if yn == 'y' or yn == 'yes':
 			continue
 		elif yn == 'n' or yn == 'no':
 			print('Exiting now...')
 			if verCompare == -1:
-				print("Now get back in your DeLorean") #Back to the future reference hehe
+				print("Now get back in your DeLorean")
 			raise SystemExit
 		else:
 			err1(1)
