@@ -21,7 +21,7 @@ def err1(q):
 		input('Error 1: Unexpected String. Press "Enter" to exit.')
 
 try:
-	response = requests.get("https://github.com/MrCatOwO/BadTranslate/releases/latest", allow_redirects=False)
+	response = requests.get("https://github.com/MrCatXj/BadTranslate/releases/latest", allow_redirects=False)
 	urlHead = response.headers.get("Location")
 	if urlHead:
 		ghVer = urlHead.rsplit("/", 1)[-1]
@@ -64,7 +64,7 @@ def random_language_code():
 async def translateText(text, iterations, langCode): # do not touch unless you want a really bad time
 	translator = Translator()
 	translated = text
-	for i in tqdm(range(iterations), desc="Translating"):
+	for i in tqdm(range(iterations), desc="Translating" , bar_format="{l_bar}{bar} | {n_fmt}/{total_fmt} | {elapsed} elapsed | ETA {remaining}"):
 		try:
 			while True:
 				randomLang = random_language_code()
@@ -130,4 +130,4 @@ def launcher():
 		else:
 			err1(1)
 			raise SystemExit
-launcher()	 
+launcher()	
