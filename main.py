@@ -129,4 +129,5 @@ def launcher():
 			raise SystemExit
 		else:
 			err1(1)
-launcher()
+			raise SystemExit
+launcher()	 
