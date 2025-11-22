@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 ver = "0.0.3-alpha.5"
 exiting = 0
-wawa = "wawa" # wawa
+
 
 #might remove this in the future because file size
 #cli = argparse.ArgumentParser(description="BadTranslate CLI")
@@ -21,7 +21,7 @@ def err1(q):
 		input('Error 1: Unexpected String. Press "Enter" to exit.')
 
 try:
-	response = requests.get("https://github.com/MrCatOwO/BadTranslate/releases/latest", allow_redirects=False)
+	response = requests.get("https://github.com/MrCatXj/BadTranslate/releases/latest", allow_redirects=False)
 	urlHead = response.headers.get("Location")
 	if urlHead:
 		ghVer = urlHead.rsplit("/", 1)[-1]
@@ -37,7 +37,7 @@ try:
 		verCompare = 1
 	elif ghVer < ver:
 		verCompare = -1
-	elif ghVer := ver:
+	elif ghVer == ver:
 		verCompare = 2
 	else:
 		verCompare = 0
@@ -48,7 +48,7 @@ def checkLangCode(lang):
 	return lang in LANGUAGES
 	
 if verCompare == 1:
-	print(f"Outdated version! Please update at github.com/MrCatOwO/BadTranslate/releases/latest ({ver} < {ghVer})")
+	print(f"Outdated version! Please update at github.com/MrCatXj/BadTranslate/releases/latest ({ver} < {ghVer})")
 elif verCompare == -1:
 	print(f"You are running a version from the future. You're either a developer, or something messed up big time. ({ver} > {ghVer})")
 elif verCompare == 2:
@@ -61,7 +61,9 @@ def random_language_code():
 	languages = list(LANGUAGES.keys())
 	return random.choice(languages)
 
-async def translateText(text, iterations, langCode): # do not touch unless you want a really bad time
+# no touchy zone begins here
+
+async def translateText(text, iterations, langCode):
 	translator = Translator()
 	translated = text
 	for i in tqdm(range(iterations), desc="Translating"):
@@ -79,11 +81,13 @@ async def translateText(text, iterations, langCode): # do not touch unless you w
 			time.sleep(1)
 	return translated
 
+# no touchy zone ends here
+
 def main():
 	inputText = input("Enter the text you want to translate: ").strip()
 	if not inputText:
 		inputText = "null"
-	langCode = input("Please select the destination language using short language codes: ").lower().strip()
+	langCode = input("Please select the destination language (ISO 639-1 code): ").lower().strip()
 	if checkLangCode(langCode):
 		print(f'Language code "{langCode}" is detected as {LANGUAGES[langCode]}')
 	elif langCode == "":
