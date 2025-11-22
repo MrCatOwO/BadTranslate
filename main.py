@@ -1,4 +1,4 @@
-import random, time, requests, asyncio, pyperclip
+import random, time, requests, asyncio, pyperclip, platform
 from packaging.version import InvalidVersion
 from googletrans import Translator, LANGUAGES
 from tqdm import tqdm
@@ -112,10 +112,11 @@ def main():
 	translated_text = asyncio.run(translateText(inputText, iterations, langCode))
 	print("Original text:", inputText)
 	print("Translated text:", translated_text)
-
-	pyperclip.copy(translated_text)     
-	print("Copied result to clipboard.")
-
+	if platform.system().lower() != "linux":
+		pyperclip.copy(translated_text)
+		print("Copied result to clipboard.")
+	else:
+		print("Copying doesnt work on linux sorry =(")
 def launcher():
 	while True:
 		main()
@@ -130,4 +131,4 @@ def launcher():
 		else:
 			err1(1)
 			raise SystemExit
-launcher()	 
+launcher()
