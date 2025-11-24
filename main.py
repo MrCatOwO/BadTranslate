@@ -107,11 +107,11 @@ def main():
 	else: #                                                                     I don't care that this is technically not an integer;
 		print(f'"{iterations}" is not an integer. Setting iterations to 100.')# it's integer enough for me.
 		iterations = 100
-	if iterations >= 1000:
-		print("An extremely high number of iterations has been selected; this might take 30 minutes or more.")
-	elif iterations >= 250:
-		print("A high number of iterations has been selected; this might take a long time.")
-	elif iterations <= 0:
+#	if iterations >= 1000:
+#		print("An extremely high number of iterations has been selected; this might take 30 minutes or more.")
+#	elif iterations >= 250:
+#		print("A high number of iterations has been selected; this might take a long time.")
+#	elif iterations <= 0:
 		print("You've selected 0 or fewer iterations; nothing will happen.")
 	translated_text = asyncio.run(translateText(inputText, iterations, langCode))
 	print("Original text:", inputText)
