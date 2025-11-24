@@ -18,26 +18,25 @@ try:
 	response = requests.get("https://github.com/MrCatXj/BadTranslate/releases/latest", allow_redirects=False)
 	urlHead = response.headers.get("Location")
 	if urlHead:
-		ghVer = urlHead.rsplit("/", 1)[-1]
-		verCompare = ghVer
+		ghVer = urlHead.rsplit("/", 1)[-1].lstrip("v")
+		verCompare = None
 	else:
 		print("Error 2: Could not find version")
 except requests.RequestException as e:
 	print(f"Error: {e}")
-ghVer = ghVer.lstrip("v")
-ver = ver.lstrip("v")
+ver1 = ver.lstrip("v")
 try:
-	if ghVer > ver:
+	if ghVer > ver1:
 		verCompare = 1
-	elif ghVer < ver:
+	elif ghVer < ver1:
 		verCompare = -1
-	elif ghVer == ver:
+	elif ghVer == ver1:
 		verCompare = 2
 	else:
 		verCompare = 0
 except InvalidVersion as e:
 	print(f"Error 3: Failed to parse: {e}")
-	verCompare = ("")
+	verCompare = None
 def checkLangCode(lang):
 	return lang in LANGUAGES
 	
@@ -85,13 +84,10 @@ def main():
 	if checkLangCode(langCode):
 		print(f'Language code "{langCode}" is detected as {LANGUAGES[langCode]}')
 	elif langCode == "":
-		langCode = "en"
+		langCode = detect(inputText)
 	else:
 		print(f'Language code "{langCode}" is not valid.')
 		print('Setting language to english.')
-		langCode = "en"
-	if langCode == "0":
-		print("no.")
 		langCode = "en"
 	iterations = input("Amount of iterations: (Default: 100) ").strip()
 	if not iterations:
@@ -110,6 +106,10 @@ def main():
 		print("Copied result to clipboard.")
 	else:
 		print("Copying doesnt work on linux sorry =(")
+
+async def detect(detectLang):
+	return await Translator.detect(detectLang)
+
 def launcher():
 	while True:
 		main()
