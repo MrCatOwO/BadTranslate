@@ -6,73 +6,41 @@ from tqdm import tqdm
 ver = "0.0.3-alpha.5"
 exiting = 0
 
-def unknownErr():
-	print("Error 4: An unknown error ocurred")
-def err1(q):
-	if q == 0:
-		input('Error 1: Unexpected String.')
-	elif q == 1:
-		input('Error 1: Unexpected String. Press "Enter" to exit.')
-
 try:
 	response = requests.get("https://github.com/MrCatXj/BadTranslate/releases/latest", allow_redirects=False)
 	urlHead = response.headers.get("Location")
-	if urlHead:
-		ghVer = urlHead.rsplit("/", 1)[-1].lstrip("v")
-		verCompare = None
-	else:
-		print("Error 2: Could not find version")
+	ghVer = urlHead.rsplit("/", 1)[-1].lstrip("v")
 except requests.RequestException as e:
 	print(f"Error: {e}")
 ver1 = ver.lstrip("v")
-try:
-	if ghVer > ver1:
-		verCompare = 1
-	elif ghVer < ver1:
-		verCompare = -1
-	elif ghVer == ver1:
-		verCompare = 2
-	else:
-		verCompare = 0
-except InvalidVersion as e:
-	print(f"Error 3: Failed to parse: {e}")
-	verCompare = None
-def checkLangCode(lang):
-	return lang in LANGUAGES
 	
-if verCompare == 1:
+if ghVer > ver1:
 	print(f"Outdated version! Please update at github.com/MrCatXj/BadTranslate/releases/latest ({ver} < {ghVer})")
-elif verCompare == -1:
+elif ghVer < ver1:
 	print(f"You are running a version from the future. You're either a developer, or something messed up big time. ({ver} > {ghVer})")
-elif verCompare == 2:
+elif ghVer == ver1:
 	print(f"You are running the latest version! ({ver})")
-elif verCompare == 0:
-	print("????? how")
 else:
-	print("")
-def random_language_code():
-	languages = list(LANGUAGES.keys())
-	return random.choice(languages)
+	print("????? how")
 
 # no touchy zone begins here
 
 async def translateText(text, iterations, langCode):
 	translator = Translator()
-	translated = text
-	for i in tqdm(range(iterations), desc="Translating" , bar_format="{l_bar}{bar} | {n_fmt}/{total_fmt} | {elapsed} elapsed | ETA {remaining}"):
+	resultTrans = text
+	for i in tqdm(range(iterations), desc="Translating..." , bar_format="{l_bar}{bar} | {n_fmt}/{total_fmt} | {elapsed} elapsed | ETA: {remaining}"):
 		try:
 			while True:
-				randomLang = random_language_code()
+				randomLang = random.choice(list(LANGUAGES))
 				if randomLang != langCode:
 					break
-			randomTrans = await translator.translate(translated, dest=randomLang)
+			randomTrans = await translator.translate(resultTrans, dest=randomLang)
 			resultTrans = await translator.translate(randomTrans.text, dest=langCode)
-			translated = resultTrans.text
-			tqdm.write(f"Iteration {i + 1}/{iterations}: {translated}")
+			tqdm.write(f"Iteration {i + 1}/{iterations} ({LANGUAGES[randomLang]} to {LANGUAGES[langCode]}): {resultTrans}")
 		except Exception as e:
 			tqdm.write(f"Error during translation at iteration {i + 1}: {e}")
 			time.sleep(1)
-	return translated
+	return resultTrans
 
 # no touchy zone ends here
 
@@ -81,10 +49,10 @@ def main():
 	if not inputText:
 		inputText = "null"
 	langCode = input("Please select the destination language (ISO 639-1 code): ").lower().strip()
-	if checkLangCode(langCode):
+	if langCode in LANGUAGES:
 		print(f'Language code "{langCode}" is detected as {LANGUAGES[langCode]}')
 	elif langCode == "":
-		langCode = detect(inputText)
+		langCode = asyncio.run(langDetect(inputText))
 	else:
 		print(f'Language code "{langCode}" is not valid.')
 		print('Setting language to english.')
@@ -98,19 +66,22 @@ def main():
 		print(f'"{iterations}" is not an integer. Setting iterations to 100.')# it's integer enough for me.
 		iterations = 100
 		print("You've selected 0 or fewer iterations; nothing will happen.")
-	translated_text = asyncio.run(translateText(inputText, iterations, langCode))
+	translatedText = asyncio.run(translateText(inputText, iterations, langCode))
 	print("Original text:", inputText)
-	print("Translated text:", translated_text)
+	print("Translated text:", translatedText)
 	if platform.system().lower() != "linux":
-		pyperclip.copy(translated_text)
+		pyperclip.copy(translatedText)
 		print("Copied result to clipboard.")
 	else:
 		print("Copying doesnt work on linux sorry =(")
 
-async def detect(detectLang):
-	return await Translator.detect(detectLang)
+async def langDetect(detectThis):
+	async with Translator() as translator:	
+		tmp = await translator.detect(detectThis) 
+		return tmp.lang
+		tmp = None
 
-def launcher():
+if __name__ == "__main__":
 	while True:
 		main()
 		yn = input('Done. Try another word? (y/n) ').strip().lower()
@@ -118,11 +89,8 @@ def launcher():
 			continue
 		elif yn == 'n' or yn == 'no':
 			print('Exiting now...')
-			if verCompare == -1:
+			if ghVer < ver1:
 				print("Now get back in your DeLorean")
-			raise SystemExit
+			break
 		else:
-			err1(1)
-			raise SystemExit
-
-launcher()
+			break
