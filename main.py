@@ -1,11 +1,11 @@
-import random, time, requests, asyncio, pyperclip
+import random, time, requests, asyncio, pyperclip, platform
 from packaging.version import InvalidVersion
 from googletrans import Translator, LANGUAGES
 from tqdm import tqdm
 
 ver = "0.0.3-alpha.5"
 exiting = 0
-wawa = "wawa" # wawa
+
 
 #might remove this in the future because file size
 #cli = argparse.ArgumentParser(description="BadTranslate CLI")
@@ -37,7 +37,7 @@ try:
 		verCompare = 1
 	elif ghVer < ver:
 		verCompare = -1
-	elif ghVer := ver:
+	elif ghVer == ver:
 		verCompare = 2
 	else:
 		verCompare = 0
@@ -48,7 +48,7 @@ def checkLangCode(lang):
 	return lang in LANGUAGES
 	
 if verCompare == 1:
-	print(f"Outdated version! Please update at github.com/MrCatOwO/BadTranslate/releases/latest ({ver} < {ghVer})")
+	print(f"Outdated version! Please update at github.com/MrCatXj/BadTranslate/releases/latest ({ver} < {ghVer})")
 elif verCompare == -1:
 	print(f"You are running a version from the future. You're either a developer, or something messed up big time. ({ver} > {ghVer})")
 elif verCompare == 2:
@@ -61,7 +61,9 @@ def random_language_code():
 	languages = list(LANGUAGES.keys())
 	return random.choice(languages)
 
-async def translateText(text, iterations, langCode): # do not touch unless you want a really bad time
+# no touchy zone begins here
+
+async def translateText(text, iterations, langCode):
 	translator = Translator()
 	translated = text
 	for i in tqdm(range(iterations), desc="Translating" , bar_format="{l_bar}{bar} | {n_fmt}/{total_fmt} | {elapsed} elapsed | ETA {remaining}"):
@@ -79,11 +81,13 @@ async def translateText(text, iterations, langCode): # do not touch unless you w
 			time.sleep(1)
 	return translated
 
+# no touchy zone ends here
+
 def main():
 	inputText = input("Enter the text you want to translate: ").strip()
 	if not inputText:
 		inputText = "null"
-	langCode = input("Please select the destination language using short language codes: ").lower().strip()
+	langCode = input("Please select the destination language (ISO 639-1 code): ").lower().strip()
 	if checkLangCode(langCode):
 		print(f'Language code "{langCode}" is detected as {LANGUAGES[langCode]}')
 	elif langCode == "":
@@ -103,19 +107,20 @@ def main():
 	else: #                                                                     I don't care that this is technically not an integer;
 		print(f'"{iterations}" is not an integer. Setting iterations to 100.')# it's integer enough for me.
 		iterations = 100
-	if iterations >= 1000:
-		print("An extremely high number of iterations has been selected; this might take 30 minutes or more.")
-	elif iterations >= 250:
-		print("A high number of iterations has been selected; this might take a long time.")
-	elif iterations <= 0:
+#	if iterations >= 1000:
+#		print("An extremely high number of iterations has been selected; this might take 30 minutes or more.")
+#	elif iterations >= 250:
+#		print("A high number of iterations has been selected; this might take a long time.")
+#	elif iterations <= 0:
 		print("You've selected 0 or fewer iterations; nothing will happen.")
 	translated_text = asyncio.run(translateText(inputText, iterations, langCode))
 	print("Original text:", inputText)
 	print("Translated text:", translated_text)
-
-	pyperclip.copy(translated_text)     
-	print("Copied result to clipboard.")
-
+	if platform.system().lower() != "linux":
+		pyperclip.copy(translated_text)
+		print("Copied result to clipboard.")
+	else:
+		print("Copying doesnt work on linux sorry =(")
 def launcher():
 	while True:
 		main()
@@ -130,4 +135,5 @@ def launcher():
 		else:
 			err1(1)
 			raise SystemExit
+
 launcher()	
