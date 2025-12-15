@@ -10,17 +10,21 @@ try:
 	urlHead = response.headers.get("Location")
 	ghVer = urlHead.rsplit("/", 1)[-1].lstrip("v")
 except requests.RequestException as e:
-	print(f"Error: {e}")
+	print(f"Could not fetch latest GitHub release: {e}")
 ver1 = ver.lstrip("v")
 	
-if ghVer > ver1:
-	print(f"Outdated version! Please update at https://github.com/MrCatXj/BadTranslate/releases/latest ({ver} < {ghVer})")
-elif ghVer < ver1:
-	print(f"You are running a version from the future. You're either a developer, or something messed up big time. ({ver} > {ghVer})")
-elif ghVer == ver1:
-	print(f"You are running the latest version! ({ver})")
-else:
-	print("????? how")
+try:
+	if ghVer > ver1:
+		print(f"Outdated version! Please update at https://github.com/MrCatXj/BadTranslate/releases/latest ({ver} < {ghVer})")
+	elif ghVer < ver1:
+		print(f"You are running a version from the future. You're either a developer, or something messed up big time. ({ver} > {ghVer})")
+	elif ghVer == ver1:
+		print(f"You are running the latest version! ({ver})")
+	else:
+		print("????? how")
+except NameError as e:
+	print(f"Could not compare versions: {e}")
+
 
 # no touchy zone begins here
 
