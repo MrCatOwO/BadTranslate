@@ -1,5 +1,4 @@
 import random, time, requests, asyncio, pyperclip, platform
-from packaging.version import InvalidVersion
 from googletrans import Translator, LANGUAGES
 from tqdm import tqdm
 
@@ -15,7 +14,7 @@ except requests.RequestException as e:
 ver1 = ver.lstrip("v")
 	
 if ghVer > ver1:
-	print(f"Outdated version! Please update at github.com/MrCatXj/BadTranslate/releases/latest ({ver} < {ghVer})")
+	print(f"Outdated version! Please update at https://github.com/MrCatXj/BadTranslate/releases/latest ({ver} < {ghVer})")
 elif ghVer < ver1:
 	print(f"You are running a version from the future. You're either a developer, or something messed up big time. ({ver} > {ghVer})")
 elif ghVer == ver1:
@@ -81,7 +80,6 @@ async def langDetect(detectThis):
 	async with Translator() as translator:	
 		tmp = await translator.detect(detectThis) 
 		return tmp.lang
-		tmp = None
 
 if __name__ == "__main__":
 	while True:
