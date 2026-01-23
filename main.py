@@ -70,7 +70,7 @@ def main():
 	else: #                                                                      I don't care that this is technically not an integer;
 		print(f'"{iterations}" is not an integer. Setting iterations to 100.') # it's integer enough for me.
 		iterations = 100
-		print("You've selected 0 or fewer iterations; nothing will happen.")
+		#print("You've selected 0 or fewer iterations; nothing will happen.")
 	translatedText = asyncio.run(translateText(inputText, iterations, langCode))
 	print("Original text:", inputText)
 	print("Translated text:", translatedText)
