@@ -1,15 +1,19 @@
-import random, time, requests, asyncio, pyperclip, platform
+import asyncio, pyperclip
 from googletrans import Translator, LANGUAGES
+from platform import system
 from tqdm import tqdm
+from time import sleep
+from requests import get, RequestException
+from random import choice
 
-ver = "0.0.3-alpha.5"
+ver = "0.0.3-alpha.6"
 exiting = 0
 
 try:
-	response = requests.get("https://github.com/MrCatXj/BadTranslate/releases/latest", allow_redirects=False)
+	response = get("https://github.com/MrCatXj/BadTranslate/releases/latest", allow_redirects=False)
 	urlHead = response.headers.get("Location")
 	ghVer = urlHead.rsplit("/", 1)[-1].lstrip("v")
-except requests.RequestException as e:
+except RequestException as e:
 	print(f"Could not fetch latest GitHub release: {e}")
 ver1 = ver.lstrip("v")
 	
@@ -17,7 +21,7 @@ try:
 	if ghVer > ver1:
 		print(f"Outdated version! Please update at https://github.com/MrCatXj/BadTranslate/releases/latest ({ver} < {ghVer})")
 	elif ghVer < ver1:
-		print(f"You are running a version from the future. You're either a developer, or something messed up big time. ({ver} > {ghVer})")
+		print(f"You are running a that is newer than the latest GitHub release. You're either a developer, or something messed up big time. ({ver} > {ghVer})")
 	elif ghVer == ver1:
 		print(f"You are running the latest version! ({ver})")
 	else:
@@ -34,7 +38,7 @@ async def translateText(text, iterations, langCode):
 	for i in tqdm(range(iterations), desc="Translating" , bar_format="{l_bar}{bar} | {n_fmt}/{total_fmt} | {elapsed} elapsed | ETA: {remaining}"):
 		try:
 			while True:
-				randomLang = random.choice(list(LANGUAGES))
+				randomLang = choice(list(LANGUAGES))
 				if randomLang != langCode:
 					break
 			randomTrans = await translator.translate(resultTrans, dest=randomLang)
@@ -43,7 +47,7 @@ async def translateText(text, iterations, langCode):
 			tqdm.write(f"Iteration {i + 1}/{iterations} ({LANGUAGES[randomLang]} to {LANGUAGES[langCode]}): {resultTrans}")
 		except Exception as e:
 			tqdm.write(f"Error during translation at iteration {i + 1}: {e}")
-			time.sleep(1)
+			sleep(1)
 	return resultTrans
 
 #hours_wasted_here = 9
@@ -52,12 +56,13 @@ async def translateText(text, iterations, langCode):
 def main():
 	inputText = input("Enter the text you want to translate: ").strip()
 	if not inputText:
-		inputText = "null"
+		exit(1)
 	langCode = input("Please select the destination language (ISO 639-1 code): ").lower().strip()
 	if langCode in LANGUAGES:
 		print(f'Language code "{langCode}" is detected as {LANGUAGES[langCode]}')
 	elif langCode == "":
 		langCode = asyncio.run(langDetect(inputText))
+		print (langCode)
 	else:
 		print(f'Language code "{langCode}" is not valid.')
 		print('Setting language to english.')
@@ -74,7 +79,7 @@ def main():
 	translatedText = asyncio.run(translateText(inputText, iterations, langCode))
 	print("Original text:", inputText)
 	print("Translated text:", translatedText)
-	if platform.system().lower() != "linux":
+	if system().lower() != "linux":
 		pyperclip.copy(translatedText)
 		print("Copied result to clipboard.")
 	else:
@@ -88,13 +93,13 @@ async def langDetect(detectThis):
 if __name__ == "__main__":
 	while True:
 		main()
-		yn = input('Done. Try another word? (y/n) ').strip().lower()
+		yn = input('Done.\nTry another word? (y/n) ').strip().lower()
 		if yn == 'y' or yn == 'yes':
 			continue
 		elif yn == 'n' or yn == 'no':
 			print('Exiting now...')
-			if ghVer < ver1:
-				print("Now get back in your DeLorean")
+			#if ghVer < ver1:
+			#	print("Now get back in your DeLorean")
 			break
 		else:
 			break

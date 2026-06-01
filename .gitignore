@@ -181,3 +181,5 @@ src/runThis2Build.bat
 /.vscode
 /.idea
 /tools
+en_us.json
+test.py
