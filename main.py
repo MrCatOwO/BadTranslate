@@ -33,21 +33,21 @@ except NameError as e:
 # no touchy zone begins here
 
 async def translateText(text, iterations, langCode):
-	translator = Translator()
-	resultTrans = text
-	for i in tqdm(range(iterations), desc="Translating" , bar_format="{l_bar}{bar} | {n_fmt}/{total_fmt} | {elapsed} elapsed | ETA: {remaining}"):
-		try:
-			while True:
-				randomLang = choice(list(LANGUAGES))
-				if randomLang != langCode:
-					break
-			randomTrans = await translator.translate(resultTrans, dest=randomLang)
-			resultTrans = await translator.translate(randomTrans.text, dest=langCode)
-			resultTrans = resultTrans.text
-			tqdm.write(f"Iteration {i + 1}/{iterations} ({LANGUAGES[randomLang]} to {LANGUAGES[langCode]}): {resultTrans}")
-		except Exception as e:
-			tqdm.write(f"Error during translation at iteration {i + 1}: {e}")
-			sleep(1)
+	with Translator as translator:
+		resultTrans = text
+		for i in tqdm(range(iterations), desc="Translating" , bar_format="{l_bar}{bar} | {n_fmt}/{total_fmt} | {elapsed} elapsed | ETA: {remaining}"):
+			try:
+				while True:
+					randomLang = choice(list(LANGUAGES))
+					if randomLang != langCode:
+						break
+				randomTrans = await translator.translate(resultTrans, dest=randomLang)
+				resultTrans = await translator.translate(randomTrans.text, dest=langCode)
+				resultTrans = resultTrans.text
+				tqdm.write(f"Iteration {i + 1}/{iterations} ({LANGUAGES[randomLang]} to {LANGUAGES[langCode]}): {resultTrans}")
+			except Exception as e:
+				tqdm.write(f"Error during translation at iteration {i + 1}: {e}")
+				await asyncio.sleep(1)
 	return resultTrans
 
 #hours_wasted_here = 9
