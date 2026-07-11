@@ -183,3 +183,4 @@ src/runThis2Build.bat
 /tools
 en_us.json
 test.py
+out.json

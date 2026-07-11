@@ -10,10 +10,10 @@ async def main():
 	tmpDir = environ.get("TEMP")
 	start = perf_counter()
 	#parse json
-	#jsonFile = input("Name of the json file: ")
-	#iterations = input("Iterations: ")
-	iterations = 100
-	jsonFile = "en_us.json"
+	jsonFile = input("Name of the json file: ")
+	iterations = input("Iterations: ")
+	#iterations = 100
+	#jsonFile = "en_us.json"
 	if exists(f"{tmpDir}\\BDjsonTmpSave.json"):
 		with open(f"{tmpDir}\\BDjsonTmpSave.json", "r", encoding="utf-8") as f:
 			jsonContent = json.load(f)
@@ -26,31 +26,36 @@ async def main():
 	keys = list(jsonContent.keys())
 	async with Translator() as translator:
 		print(type(jsonContent))
-		for i in tqdm(range(startingPos,len(jsonContent))):
+		for i in tqdm(range(startingPos, len(jsonContent))):
 			tqdm.write(jsonContent[keys[i]])
-			try:
+			with open(f"{tmpDir}\\pos.txt", "w", encoding="utf-8") as f:
+				f.write(str(i))
+			"""try:
 				detection = await translator.detect(jsonContent[keys[i]])
 				detection = detection.lang
 			except Exception as e:
-				print(f"Detetion error: {e}.\nFalling back to english")
-				detection = "en"
+				print(f"Detetion error: {e}.\nFalling back to english")"""
+			detection = "en"
 			jsonContent[keys[i]] = await translateText(jsonContent[keys[i]], iterations, detection, translator)
 			print(jsonContent[keys[i]])
 			with open(f"{tmpDir}\\BDjsonTmpSave.json", "w", encoding="utf-8") as f:
 				json.dump(jsonContent, f, ensure_ascii=False)
-			with open(f"{tmpDir}\\pos.txt", "w", encoding="utf-8") as f:
-				f.write(str(i))
 	with open("out.json", "w", encoding="utf-8") as f:
 		json.dump(jsonContent, f, ensure_ascii=False)
 	try:
 		remove(f"{tmpDir}\\BDjsonTmpSave.json")
+		
+	except FileNotFoundError:
+		pass
+	try:
+		remove(f"{tmpDir}\\pos.txt")
 	except FileNotFoundError:
 		pass
 	print(f"Total translation time: {start - perf_counter():.2f} s")
 
 async def translateText(text, iterations, langCode, translator):
 	resultTrans = text
-	for i in tqdm(range(iterations), desc="Translating" , bar_format="{l_bar}{bar} | {n_fmt}/{total_fmt} | {elapsed} elapsed | ETA: {remaining}"):
+	for i in tqdm(range(iterations)):
 		try:
 			while True:
 				randomLang = choice(list(LANGUAGES))
